@@ -98,3 +98,40 @@ public extension UIView {
         transform = CGAffineTransform.identity
     }
 }
+
+//MARK: - Containers
+extension UIViewController {
+    
+    func setContentOfViewController(_ vc: UIViewController, toView view:UIView) {
+        view.setContentOfViewController(vc)
+        
+        addChildViewController(vc)
+        vc.didMove(toParentViewController: self)
+    }
+    
+}
+
+extension UIView {
+    func setContentOfViewController(_ vc:UIViewController) {
+        vc.view.translatesAutoresizingMaskIntoConstraints = false
+        
+        addSubview(vc.view)
+        
+        _ = NSLayoutConstraint.constraints(
+            withVisualFormat: "V:|[content]|",
+            options: NSLayoutFormatOptions(rawValue: 0),
+            metrics: nil,
+            views: ["content" : vc.view]
+        ).map { $0.isActive = true }
+        
+        _ = NSLayoutConstraint.constraints(
+            withVisualFormat: "H:|[content]|",
+            options: NSLayoutFormatOptions(rawValue: 0),
+            metrics: nil,
+            views: ["content" : vc.view]
+        ).map { $0.isActive = true }
+        
+        layoutIfNeeded()
+    }
+}
+
