@@ -38,9 +38,15 @@ extension UIView {
     }
     
     private func clearizeBackgrounds(subviews: [UIView]) {
-        subviews.forEach {
+        recursive(subviews: subviews) {
             $0.backgroundColor = UIColor.clear
-            clearizeBackgrounds(subviews: $0.subviews)
+        }
+    }
+
+    func recursive(subviews: [UIView], map: (UIView)-> Void) {
+        subviews.forEach {
+            map($0)
+            recursive(subviews: $0.subviews, map: map)
         }
     }
 }
@@ -62,6 +68,12 @@ extension UIView {
 
 //MARK: - Анимации
 public extension UIView {
+    fileprivate enum ShakeConstants {
+        static let animationRotateDeg = 0.5
+        static let animationTranslateX: CGFloat = 0.0
+        static let animationTranslateY: CGFloat = 0.0
+    }
+    
     public func startJiggling() {
         let degreesToRadians = { (x: Double) -> CGFloat in
             return CGFloat(M_PI * x / 180)
