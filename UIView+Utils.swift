@@ -43,7 +43,7 @@ extension UIView {
         }
     }
 
-    func recursive(subviews: [UIView], map: (UIView)-> Void) {
+    public func recursive(subviews: [UIView], map: (UIView)-> Void) {
         subviews.forEach {
             map($0)
             recursive(subviews: $0.subviews, map: map)
