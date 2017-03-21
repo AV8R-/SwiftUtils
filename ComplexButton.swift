@@ -15,11 +15,18 @@ class ComplexButton: UIControl {
         initOverlayButton()
     }
     
-    @IBOutlet var nestedButtons: [UIButton] = [] {
-        didSet {
-            self.bringSubview(toFront: overlay)
+    lazy var nestedButtons: [UIButton] = {
+        var buttons = [UIButton]()
+        let count = self.subviews.count - 1 > 0 ? self.subviews.count - 1 : 0
+        let sbviews = Array(self.subviews[0..<1])
+        self.recursive(subviews: sbviews) {
+            if let button = $0 as? UIButton {
+                buttons.append(button)
+            }
         }
-    }
+        return buttons
+    }()
+    
     private weak var overlay: UIButton!
     
     private func initOverlayButton() {
@@ -43,8 +50,17 @@ class ComplexButton: UIControl {
     }}
 
     override var isHighlighted: Bool { didSet {
-        self.nestedButtons.forEach { $0.isHighlighted = isHighlighted }
+        let count = subviews.count - 1 > 0 ? subviews.count - 1 : 0
+        let alpha: CGFloat = isHighlighted ? 0.3 : 1
+        for subview in subviews[0..<count] {
+            subview.alpha = alpha
+        }
     }}
+    
+    override func layoutIfNeeded() {
+        super.layoutIfNeeded()
+        self.bringSubview(toFront: overlay)
+    }
     
     override var contentVerticalAlignment: UIControlContentVerticalAlignment { didSet {
         self.nestedButtons.forEach { $0.contentVerticalAlignment = contentVerticalAlignment }
@@ -91,5 +107,11 @@ class ComplexButton: UIControl {
         case "enabled"?: isEnabled = newValue
         default:()
         }
+    }
+    
+    deinit {
+        overlay.removeObserver(self, forKeyPath: "highlighted")
+        overlay.removeObserver(self, forKeyPath: "selected")
+        overlay.removeObserver(self, forKeyPath: "enabled")
     }
 }
