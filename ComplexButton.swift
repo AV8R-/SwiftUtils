@@ -15,6 +15,11 @@ class ComplexButton: UIControl {
         initOverlayButton()
     }
     
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        initOverlayButton()
+    }
+    
     lazy var nestedButtons: [UIButton] = {
         var buttons = [UIButton]()
         let count = self.subviews.count - 1 > 0 ? self.subviews.count - 1 : 0
@@ -60,6 +65,14 @@ class ComplexButton: UIControl {
     override func layoutIfNeeded() {
         super.layoutIfNeeded()
         self.bringSubview(toFront: overlay)
+    }
+    
+    override func addSubview(_ view: UIView) {
+        if let overlay = overlay {
+            insertSubview(view, belowSubview: overlay)
+        } else {
+            super.addSubview(view)
+        }
     }
     
     override var contentVerticalAlignment: UIControlContentVerticalAlignment { didSet {
