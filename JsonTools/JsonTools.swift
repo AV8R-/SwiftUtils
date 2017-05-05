@@ -6,8 +6,8 @@
 //
 //
 
-import UIKit
-import UltimateGuitarApi
+import Foundation
+import CoreData
 
 func mapReflection<T, U>(x: T, transform: (Mirror) -> U) -> U {
     let mirror = Mirror(reflecting: x)
@@ -68,10 +68,10 @@ extension Swift.Collection {
     
     func propsToJson() -> [Any] {
         return flatMap {
-            let extra = ($0 as? ExtraJsonConvertable)?.extraJsonFields()
+            let extra = ($0 as? ExtraJsonConvertable)?.extraJsonFields() ?? [:]
             let json = anyToJson($0)
             if let dic = json as? [String: Any] {
-                return dic.merged(with: extra) //objectToJsonMap(mirror: Mirror(reflecting: $0)).merged(with: extra)
+                return dic + extra
             } else {
                 return nil
             }
@@ -82,10 +82,10 @@ extension Swift.Collection {
 extension Swift.Collection where Iterator.Element: NSManagedObject {
     func propsToJson() -> [Any] {
         return flatMap {
-            let extra = ($0 as? ExtraJsonConvertable)?.extraJsonFields()
+            let extra = ($0 as? ExtraJsonConvertable)?.extraJsonFields() ?? [:]
             let json = anyToJson($0)
             if let dic = json as? [String: Any] {
-                return dic.merged(with: extra) //objectToJsonMap(mirror: Mirror(reflecting: $0)).merged(with: extra)
+                return dic + extra
             } else {
                 return nil
             }
@@ -121,7 +121,7 @@ extension NSManagedObject {
             }
         } //.forEach { dict[$0] = $1 }
         if let extra = self as? ExtraJsonConvertable {
-            return dict.merged(with: extra.extraJsonFields())
+            return dict + extra.extraJsonFields()
         } else {
             return dict
         }
@@ -131,29 +131,4 @@ extension NSManagedObject {
 //MARK: Костыли
 protocol ExtraJsonConvertable {
     func extraJsonFields() -> [String: Any]
-}
-
-extension EVOTab: ExtraJsonConvertable {
-    func extraJsonFields() -> [String: Any] {
-        return [
-            "hasPreset": toneBridgeInfo?.mainPresetId ?? 0 != 0,
-            "isDownloaded": isDownloaded()
-        ]
-    }
-}
-
-extension EVOChordObject: ExtraJsonConvertable {
-    func extraJsonFields() -> [String : Any] {
-        return [
-            "variations": variations()?.propsToJson() ?? []
-        ]
-    }
-}
-
-extension TabVideo: ExtraJsonConvertable {
-    func extraJsonFields() -> [String: Any] {
-        return [
-            "meta": anyToJson(metadata!)
-        ]
-    }
 }

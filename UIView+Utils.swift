@@ -6,7 +6,7 @@
 //
 //
 
-import Foundation
+import UIKit
 
 //MARK: - Инициализация
 extension UIView {
