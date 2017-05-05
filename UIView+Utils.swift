@@ -10,11 +10,18 @@ import UIKit
 
 //MARK: - Инициализация
 extension UIView {
+    enum UIViewLoadingError: Error {
+        case notFound
+    }
+    
     /**
      Загружает и возвращает UIView из Xib
      */
-    open class func instantiateFromXib<T: UIView>(_ named: String = String(describing: T.self), bundle: Bundle = Bundle(for: T.self)) -> T! {
-        return bundle.loadNibNamed(named, owner: nil, options: nil)?.first as? T
+    open class func instantiateFromXib<T: UIView>(_ named: String = String(describing: T.self), bundle: Bundle = Bundle(for: T.self)) throws -> T {
+        guard let view = bundle.loadNibNamed(named, owner: nil, options: nil)?.first as? T else {
+            throw UIViewLoadingError.notFound
+        }
+        return view
     }
     
     /**
