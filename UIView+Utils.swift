@@ -20,14 +20,11 @@ extension UIView {
     /**
      Загружает вьюху с кастомным сабклассом из ксибаT
      */
-    open func fromNib<T : UIView>() -> T? {
-        let bundle = Bundle(for: type(of: self))
-        guard let view = bundle.loadNibNamed(String(describing: type(of: self)), owner: self, options: nil)?[0] as? T else {
-            return nil
-        }
+    open func addNib<T : UIView>() throws -> T {
+        let view: T = try T.instantiateFromXib()
         self.addSubview(view)
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.addConstraintsToSuperviewBounds()
+        try view.constrainSuperview()
         return view
     }
     
@@ -67,16 +64,70 @@ extension UIView {
 }
 
 //MARK: - Анимации
+public extension CATransition {
+    public convenience init(fadeDuration:TimeInterval) {
+        self.init()
+        duration = fadeDuration
+        timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
+        type = kCATransitionFade
+    }
+}
+
 public extension UIView {
+    public func runFade (_ duration: TimeInterval = 0.2) {
+        layer.add(CATransition(fadeDuration: duration), forKey: nil)
+    }
+    public func runShakeAnimation(_ duration: TimeInterval) {
+        runShakeAnimation(duration, repeatCount: 2, xCenterOffset: 6.0)
+    }
+    public func runShakeAnimation(_ duration: TimeInterval, repeatCount: Float, xCenterOffset: CGFloat) {
+        let animation = CABasicAnimation(keyPath: "position")
+        animation.duration = duration
+        animation.repeatCount = repeatCount
+        animation.autoreverses = true
+        animation.fromValue = NSValue(cgPoint: CGPoint(x: center.x - xCenterOffset, y: center.y))
+        animation.toValue = NSValue(cgPoint: CGPoint(x: center.x + xCenterOffset, y: center.y))
+        layer.add(animation, forKey: "shake")
+    }
+    public func startFadeInFadeOutAnimation(_ duration: TimeInterval = 0.75, repeatCount: Float = Float.infinity, fromValue: Float = 1, toValue: Float = 0, autoreverses: Bool = true) {
+        let animation = CABasicAnimation(keyPath: "opacity")
+        animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
+        animation.fromValue = NSNumber(value: fromValue as Float)
+        animation.toValue = NSNumber(value: toValue as Float)
+        animation.duration = duration
+        animation.autoreverses = autoreverses
+        animation.repeatCount = repeatCount
+        layer.add(animation, forKey:"fadeInOut")
+    }
+    public func opacityPulseAnimation(_ duration: TimeInterval = 30) {
+        let pulseAnimation:CABasicAnimation = CABasicAnimation(keyPath: "opacity")
+        pulseAnimation.duration = duration
+        pulseAnimation.toValue = 1
+        pulseAnimation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
+        pulseAnimation.autoreverses = true
+        pulseAnimation.repeatCount = Float.infinity
+        self.layer.add(pulseAnimation, forKey: nil)
+    }
+    public func scalePulseAnimation(_ duration: TimeInterval = 30) {
+        let pulseAnimation:CABasicAnimation = CABasicAnimation(keyPath: "transform.scale")
+        pulseAnimation.duration = duration
+        pulseAnimation.toValue = 1
+        pulseAnimation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
+        pulseAnimation.autoreverses = true
+        pulseAnimation.repeatCount = Float.infinity
+        self.layer.add(pulseAnimation, forKey: nil)
+    }
+    
     fileprivate enum ShakeConstants {
         static let animationRotateDeg = 0.5
         static let animationTranslateX: CGFloat = 0.0
         static let animationTranslateY: CGFloat = 0.0
+        
     }
     
     public func startJiggling() {
         let degreesToRadians = { (x: Double) -> CGFloat in
-            return CGFloat(M_PI * x / 180)
+            return CGFloat(Double.pi * x / 180)
         }
         
         let isEven = { (x: Int) -> Bool in
