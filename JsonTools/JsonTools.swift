@@ -18,8 +18,8 @@ func objectToJsonMap(mirror: Mirror) -> [String: Any] {
     var result = [String: Any]()
     mirror.children.forEach {
         switch $0.value {
-        case Optional<Any>.some(let data) where data is NSData: print("WARNING: \($0.label) is serialized!")
-        case is NSData: print("WARNING: \($0.label) is serialized!")
+        case Optional<Any>.some(let data) where data is NSData: print("WARNING: " + String(describing: $0.label) + " is serialized!")
+        case is NSData: print("WARNING: " + String(describing: $0.label) + " is serialized!")
         case Optional<Any>.none: break
         case Optional<Any>.some(let x):
             print(x)
