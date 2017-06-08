@@ -10,12 +10,12 @@ import Foundation
 import AVFoundation
 
 extension AVCaptureDevice {
-    static func executeIfPermitted(_ exec: @escaping ()->Void) throws {
+    static func executeIfPermitted(_ exec: @escaping ()->Void, fail: (()->Void)? = nil) {
         let cameraMediaType = AVMediaTypeVideo
         let cameraAuthorizationStatus = AVCaptureDevice.authorizationStatus(forMediaType: cameraMediaType)
         
         switch cameraAuthorizationStatus {
-        case .denied, .restricted: throw PermissionError.accessDenied
+        case .denied, .restricted: fail?()
         case .authorized: exec()
             
         case .notDetermined:
@@ -23,7 +23,7 @@ extension AVCaptureDevice {
                 if granted {
                     exec()
                 } else {
-                    debugPrint("Denied access to \(cameraMediaType)")
+                    fail?()
                 }
             }
         }

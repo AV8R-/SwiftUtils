@@ -8,23 +8,18 @@
 
 import Photos
 
-enum PermissionError: Error {
-    case accessDenied
-}
-
 extension PHPhotoLibrary {
     
-    static func executeIfPermitted(_ exec: @escaping ()->Void) throws {
+    static func executeIfPermitted(_ exec: @escaping ()->Void, fail: (()->Void)? = nil) {
         let status = PHPhotoLibrary.authorizationStatus()
         switch status {
         case .authorized: exec()
-        case .denied, .restricted : throw PermissionError.accessDenied
+        case .denied, .restricted : fail?()
         case .notDetermined:
             PHPhotoLibrary.requestAuthorization() { status in
                 switch status {
                 case .authorized: exec()
-                case .denied, .restricted: debugPrint("Access denied")
-                case .notDetermined: debugPrint("Access denied")
+                case .denied, .restricted, .notDetermined: fail?()
                 }
             }
         }
