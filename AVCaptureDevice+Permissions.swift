@@ -11,15 +11,15 @@ import AVFoundation
 
 extension AVCaptureDevice {
     static func executeIfPermitted(_ exec: @escaping ()->Void, fail: (()->Void)? = nil) {
-        let cameraMediaType = AVMediaTypeVideo
-        let cameraAuthorizationStatus = AVCaptureDevice.authorizationStatus(forMediaType: cameraMediaType)
+        let cameraMediaType = AVMediaType.video
+        let cameraAuthorizationStatus = AVCaptureDevice.authorizationStatus(for: cameraMediaType)
         
         switch cameraAuthorizationStatus {
         case .denied, .restricted: fail?()
         case .authorized: exec()
             
         case .notDetermined:
-            AVCaptureDevice.requestAccess(forMediaType: cameraMediaType) { granted in
+            AVCaptureDevice.requestAccess(for: cameraMediaType) { granted in
                 if granted {
                     exec()
                 } else {

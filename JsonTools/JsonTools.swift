@@ -45,7 +45,7 @@ func anyToJson(_ object: Any) -> Any {
         var ans = [String: Any]()
         dictionary.forEach {
 //            if let stringable = $0 {
-                ans[String(describing: $0)] = anyToJson($1)
+                ans[String(describing: $0.0)] = anyToJson($0.1)
 //            }
         }
         return ans
@@ -113,13 +113,13 @@ extension NSManagedObject {
     func propsToJson() -> [String: Any] {
         let allKeys = NSDictionary(dictionary: entity.attributesByName).allKeys as! [String]
         var dict = [String: Any]()
-        dictionaryWithValues(forKeys: allKeys).filter { !($1 is Data) && !($1 is NSNull) }.forEach {
-            if $1 is StrictType {
-                dict[$0] = $1
+        dictionaryWithValues(forKeys: allKeys).filter { !($0.1 is Data) && !($0.1 is NSNull) }.forEach {
+            if $0.1 is StrictType {
+                dict[$0.0] = $0.1
             } else {
-                dict[$0] = anyToJson($1)
+                dict[$0.0] = anyToJson($0.1)
             }
-        } //.forEach { dict[$0] = $1 }
+        }
         if let extra = self as? ExtraJsonConvertable {
             return dict + extra.extraJsonFields()
         } else {
