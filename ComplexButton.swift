@@ -20,6 +20,16 @@ class ComplexButton: UIControl {
         initOverlayButton()
     }
     
+    public var onPress: (()->Void)? {
+        didSet {
+            if let _ = onPress {
+                overlay.addTarget(self, action: #selector(touchUpInside), for: .touchUpInside)
+            } else {
+                overlay.removeTarget(self, action: #selector(touchUpInside), for: .touchUpInside)
+            }
+        }
+    }
+    
     lazy var nestedButtons: [UIButton] = {
         var buttons = [UIButton]()
         let count = self.subviews.count - 1 > 0 ? self.subviews.count - 1 : 0
@@ -126,5 +136,9 @@ class ComplexButton: UIControl {
         overlay.removeObserver(self, forKeyPath: "highlighted")
         overlay.removeObserver(self, forKeyPath: "selected")
         overlay.removeObserver(self, forKeyPath: "enabled")
+    }
+    
+    @objc func touchUpInside(_ sender: Any) {
+        onPress?()
     }
 }
