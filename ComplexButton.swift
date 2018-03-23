@@ -8,7 +8,7 @@
 
 import UIKit
 
-public class ComplexButton: UIControl {
+open class ComplexButton: UIControl {
     
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -61,15 +61,15 @@ public class ComplexButton: UIControl {
         self.overlay = overlay
     }
     
-    override public var isEnabled: Bool { didSet {
+    override open var isEnabled: Bool { didSet {
         self.nestedButtons.forEach { $0.isEnabled = isEnabled }
     }}
 
-    override public var isSelected: Bool { didSet {
+    override open var isSelected: Bool { didSet {
         self.nestedButtons.forEach { $0.isSelected = isSelected }
     }}
 
-    override public var isHighlighted: Bool { didSet {
+    override open var isHighlighted: Bool { didSet {
         guard shouldMakeTranclucentOnHiglhlight else {
             return
         }
@@ -80,12 +80,12 @@ public class ComplexButton: UIControl {
         }
     }}
     
-    override public func layoutIfNeeded() {
+    override open func layoutIfNeeded() {
         super.layoutIfNeeded()
         self.bringSubview(toFront: overlay)
     }
     
-    override public func addSubview(_ view: UIView) {
+    override open func addSubview(_ view: UIView) {
         if let overlay = overlay {
             insertSubview(view, belowSubview: overlay)
         } else {
@@ -93,44 +93,44 @@ public class ComplexButton: UIControl {
         }
     }
     
-    override public var contentVerticalAlignment: UIControlContentVerticalAlignment { didSet {
+    override open var contentVerticalAlignment: UIControlContentVerticalAlignment { didSet {
         self.nestedButtons.forEach { $0.contentVerticalAlignment = contentVerticalAlignment }
     }}
     
-    override public var contentHorizontalAlignment: UIControlContentHorizontalAlignment{ didSet {
+    override open var contentHorizontalAlignment: UIControlContentHorizontalAlignment{ didSet {
         self.nestedButtons.forEach { $0.contentHorizontalAlignment = contentHorizontalAlignment }
     }}
     
     
-    override public func beginTracking(_ touch: UITouch, with event: UIEvent?) -> Bool {
+    override open func beginTracking(_ touch: UITouch, with event: UIEvent?) -> Bool {
         self.nestedButtons.forEach { $0.beginTracking(touch, with: event) }
         return super.beginTracking(touch, with: event)
     }
 
-    override public func continueTracking(_ touch: UITouch, with event: UIEvent?) -> Bool {
+    override open func continueTracking(_ touch: UITouch, with event: UIEvent?) -> Bool {
         self.nestedButtons.forEach { $0.continueTracking(touch, with: event) }
         return super.continueTracking(touch, with: event)
     }
 
-    override public func endTracking(_ touch: UITouch?, with event: UIEvent?) {
+    override open func endTracking(_ touch: UITouch?, with event: UIEvent?) {
         self.nestedButtons.forEach { $0.endTracking(touch, with: event) }
         return super.endTracking(touch, with: event)
     }
 
-    override public func cancelTracking(with event: UIEvent?) {
+    override open func cancelTracking(with event: UIEvent?) {
         self.nestedButtons.forEach { $0.cancelTracking(with: event) }
         super.cancelTracking(with: event)
     }
     
-    override public func addTarget(_ target: Any?, action: Selector, for controlEvents: UIControlEvents) {
+    override open func addTarget(_ target: Any?, action: Selector, for controlEvents: UIControlEvents) {
         overlay.addTarget(target, action: action, for: controlEvents)
     }
     
-    override public func removeTarget(_ target: Any?, action: Selector?, for controlEvents: UIControlEvents) {
+    override open func removeTarget(_ target: Any?, action: Selector?, for controlEvents: UIControlEvents) {
         overlay.removeTarget(target, action: action, for: controlEvents)
     }
     
-    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+    override open func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         let newValue = change![.newKey] as! Bool
         switch keyPath {
         case "highlighted"?: isHighlighted = newValue
