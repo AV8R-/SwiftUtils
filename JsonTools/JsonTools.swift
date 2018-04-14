@@ -67,7 +67,7 @@ extension Swift.Collection {
     }
     
     func propsToJson() -> [Any] {
-        return flatMap {
+        return compactMap {
             let extra = ($0 as? ExtraJsonConvertable)?.extraJsonFields() ?? [:]
             let json = anyToJson($0)
             if let dic = json as? [String: Any] {
@@ -81,7 +81,7 @@ extension Swift.Collection {
 
 extension Swift.Collection where Iterator.Element: NSManagedObject {
     func propsToJson() -> [Any] {
-        return flatMap {
+        return compactMap {
             let extra = ($0 as? ExtraJsonConvertable)?.extraJsonFields() ?? [:]
             let json = anyToJson($0)
             if let dic = json as? [String: Any] {
@@ -96,7 +96,7 @@ extension Swift.Collection where Iterator.Element: NSManagedObject {
 extension Swift.Collection where Iterator.Element == Numeric {
     func propsToJson() -> [Any] {
         switch first {
-        case is NSNumber: return flatMap { ($0 as! NSNumber).intValue }
+        case is NSNumber: return compactMap { ($0 as! NSNumber).intValue }
         default: return self as! [Any]
         }
     }
